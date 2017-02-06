@@ -6,12 +6,28 @@ var dictionary = {
 };
 
 var player = new Player(dictionary.white);
+var ai = new Player(dictionary.black);
 
 var game = {
+  side: 0,
   files: 0,
   ranks: 0,
   board: '',
-  pieces: ['q', 'r', 'b', 'n', 'p'],
+  pieces: ['q', 'r', 'b', 'n', 'p'], // droppable pieces
+
+  makeMove: function () {
+    if (this.side == 0) {
+      this.side = 1;
+    } else {
+      this.side = 0;
+    }
+    this.drawInfo();
+
+    // kick off the AI, if its turn
+    if (ai.side == this.side) {
+      setTimeout(function(){ ai.think(); },10000);
+    }
+  },
 
   loadFEN: function (fen) {
     // load fen here
@@ -29,6 +45,7 @@ var game = {
       slashes++;
       this.board.push(rankArray);
     }
+    this.side = 1; // should come from fen
   },
 
   squareClasses(piece, shade) {
@@ -39,7 +56,14 @@ var game = {
     return (shade ? 'square shade' : 'square') + ' ' + piece;
   },
 
-  drawInterface: function (fromSide = dictionary.white) {
+  drawInfo: function () {
+    // info board
+    document.getElementById('info').innerHTML = 'Centipawns: ' + player.centipawns + '<br/>'
+      + 'Player: ' + (player.side == dictionary.white ? 'white' : 'black') + '<br/>'
+      + 'Turn: ' + (game.side == dictionary.white ? 'white' : 'black');
+  },
+
+  drawBoard: function (fromSide = dictionary.white) {
     // also blah = document.createElement('tagname'); blah.attr = val; ...
     var board = '<table cellpadding="0" cellspacing="0" border="0">';
 
@@ -76,14 +100,15 @@ var game = {
     for (var file = 0; file < this.pieces.length; ++file) {
       var thisPiece = this.pieces[file].toUpperCase();
       pieces += '<td id="drop' + thisPiece + '" draggable="true" ondragstart="drag(event)" class="' 
-        + this.squareClasses(thisPiece, true) + '"></td>';
+        + this.squareClasses(thisPiece, game.side == player.side) + '"></td>';
     }
 
     pieces += '</tr></table>';
     document.getElementById('pieces').innerHTML = pieces;
+  },
 
-    // info board
-    document.getElementById('info').innerHTML = 'Centipawns: ' + player.centipawns + '<br/>'
-      + 'Side: ' + (player.side == dictionary.white ? 'white' : 'black');
+  drawInterface: function (fromSide) {
+    this.drawBoard(fromSide);
+    this.drawInfo();
   }
 };

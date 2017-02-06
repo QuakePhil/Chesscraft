@@ -1,4 +1,6 @@
 function allowDrop (e) {
+  if (player.side !== game.side) return false;
+
   e.preventDefault();
 }
 
@@ -27,6 +29,8 @@ function drop (e) {
   var className = 'square';
   if (e.target.className.indexOf('shade') !== -1) className += ' shade';
   e.target.className = className + ' ' + piece;
+
+  game.makeMove();
 }
 
 //game.loadFEN('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');

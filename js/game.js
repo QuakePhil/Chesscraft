@@ -17,7 +17,6 @@ var game = {
     this.board = [];
     fen = fen.replace(/8/g,'        ').replace(/7/g,'       ').replace(/6/g,'      ')
       .replace(/5/g,'     ').replace(/4/g,'    ').replace(/3/g,'   ').replace(/2/g,'  ').replace(/1/g,' ');
-    console.log(fen);
     var slashes = 0;
     for (var file = 0; file < game.files; ++file) {
       var rankArray = [];
@@ -27,7 +26,6 @@ var game = {
       slashes++;
       this.board.push(rankArray);
     }
-    console.log(this.board);
   },
 
   squareClasses(piece, shade) {

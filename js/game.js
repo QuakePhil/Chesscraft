@@ -13,6 +13,7 @@ var game = {
   files: 0,
   ranks: 0,
   board: '',
+  centipawns: 0, // centipawns of dragged piece
   pieces: ['q', 'r', 'b', 'n', 'p'], // droppable pieces
 
   makeMove: function () {
@@ -21,12 +22,16 @@ var game = {
     } else {
       this.side = 0;
     }
-    this.drawInfo();
 
     // kick off the AI, if its turn
     if (ai.side == this.side) {
-      setTimeout(function(){ ai.think(); },10000);
+      ai.centipawns += 100;
+      setTimeout(function(){ ai.think(); },3000);
+    } else {
+      player.centipawns += 100;
     }
+
+    this.drawInfo();
   },
 
   loadFEN: function (fen) {

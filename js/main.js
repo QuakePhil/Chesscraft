@@ -1,11 +1,15 @@
 function allowDrop (e) {
   if (player.side !== game.side) return false;
+  if (player.centipawns < game.centipawns) return false;
 
   e.preventDefault();
 }
 
 function drag (e) {
-  e.dataTransfer.setData('text', e.target.id)
+  var cp = {'dropQ': 900, 'dropR': 500, 'dropB': 300, 'dropN': 300, 'dropP': 100 };
+
+  e.dataTransfer.setData('text', e.target.id);
+  game.centipawns = cp[e.target.id];
 }
 
 function drop (e) {
@@ -24,6 +28,9 @@ function drop (e) {
   // update board
   var piece = e.dataTransfer.getData('text').substring(4,5);
   game.board[rank][file] = piece;
+
+  var cp = {'dropQ': 900, 'dropR': 500, 'dropB': 300, 'dropN': 300, 'dropP': 100 };
+  player.centipawns -= cp[e.dataTransfer.getData('text')];
 
   // update the UI
   var className = 'square';

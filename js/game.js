@@ -30,10 +30,10 @@ var game = {
 
   squareClasses(piece, shade) {
     if (piece == ' ') {
-      return shade ? 'square' : 'square shade';
+      return shade ? 'square shade' : 'square';
     }
 
-    return (shade ? 'square' : 'square shade') + ' ' + piece;
+    return (shade ? 'square shade' : 'square') + ' ' + piece;
   },
 
   drawBoard: function (fromSide = dictionary.white) {

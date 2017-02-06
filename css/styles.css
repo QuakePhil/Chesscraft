@@ -1,0 +1,28 @@
+/* styles */
+
+.square {
+  width: 40px;
+  height: 40px;
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+  background-color: #aaa;
+}
+
+.shade {
+  background-color: #ddd;
+}
+
+.k { background-image: none, url('Chess_kdt45.svg'); }
+.q { background-image: none, url('Chess_qdt45.svg'); }
+.r { background-image: none, url('Chess_rdt45.svg'); }
+.b { background-image: none, url('Chess_bdt45.svg'); }
+.n { background-image: none, url('Chess_ndt45.svg'); }
+.p { background-image: none, url('Chess_pdt45.svg'); }
+
+.K { background-image: none, url('Chess_klt45.svg'); }
+.Q { background-image: none, url('Chess_qlt45.svg'); }
+.R { background-image: none, url('Chess_rlt45.svg'); }
+.B { background-image: none, url('Chess_blt45.svg'); }
+.N { background-image: none, url('Chess_nlt45.svg'); }
+.P { background-image: none, url('Chess_plt45.svg'); }
+

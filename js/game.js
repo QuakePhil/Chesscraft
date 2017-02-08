@@ -6,12 +6,20 @@ var dictionary = {
         white: 1,
         files: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'],
         ranks: ['8', '7', '6', '5', '4', '3', '2', '1'],
-        pieces: {k: 0, q: 0, r: 0, b: 0, n: 0, p: 0, K: 1, Q: 1, R: 1, B: 1, N: 1, P: 1 }
+        pieces: {k: 0, q: 0, r: 0, b: 0, n: 0, p: 0, K: 1, Q: 1, R: 1, B: 1, N: 1, P: 1 },
+        cp: {
+            'dropQ': 900,
+            'dropR': 500,
+            'dropB': 300,
+            'dropN': 300,
+            'dropP': 100
+        }
     },
 
     player = new Player(dictionary.white),
     opponent = new Player(dictionary.black),
 
+    dropMove = false, // to track where we can drag/drop in main.js
     game = {
         side: 0,
         files: 0,

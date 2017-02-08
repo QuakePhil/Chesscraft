@@ -6,21 +6,16 @@ function allowDrop(e) {
     if (player.side !== game.side) { return false; }
     if (player.centipawns < game.centipawns) { return false; }
 
+    // disallow for any but the first 2 ranks
+    if (parseInt(e.target.id.substring(6), 10) < 48) { return false; }
+
     e.preventDefault();
 }
 
 function drag(e) {
     'use strict';
-    var cp = {
-        'dropQ': 900,
-        'dropR': 500,
-        'dropB': 300,
-        'dropN': 300,
-        'dropP': 100
-    };
-
     e.dataTransfer.setData('text', e.target.id);
-    game.centipawns = cp[e.target.id];
+    game.centipawns = dictionary.cp[e.target.id];
 }
 
 function drop(e) {
@@ -30,13 +25,6 @@ function drop(e) {
     // validate the move
     var className,
         piece,
-        cp = {
-            'dropQ': 900,
-            'dropR': 500,
-            'dropB': 300,
-            'dropN': 300,
-            'dropP': 100
-        },
         square = parseInt(e.target.id.substring(6), 10),
         rank = parseInt(square / game.ranks, 10),
         file = square % game.files;
@@ -46,7 +34,7 @@ function drop(e) {
         return;
     }
 
-    player.centipawns -= cp[e.dataTransfer.getData('text')];
+    player.centipawns -= dictionary.cp[e.dataTransfer.getData('text')];
 
     // update the UI
     className = 'square';

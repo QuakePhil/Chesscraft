@@ -61,5 +61,6 @@ function drop(e) {
 }
 
 //game.loadFEN('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
-game.loadFEN('4k3/8/8/8/8/8/8/4K3 w - -');
+game.loadFEN('3bk3/8/p7/rp6/rp6/p7/8/4K3 w - -');
+//game.loadFEN('4k3/8/8/8/8/8/8/4K3 w - -');
 game.drawInterface(dictionary.white);

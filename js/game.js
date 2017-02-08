@@ -5,11 +5,12 @@ var dictionary = {
         black: 0,
         white: 1,
         files: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'],
-        ranks: ['8', '7', '6', '5', '4', '3', '2', '1']
+        ranks: ['8', '7', '6', '5', '4', '3', '2', '1'],
+        pieces: {k: 0, q: 0, r: 0, b: 0, n: 0, p: 0, K: 1, Q: 1, R: 1, B: 1, N: 1, P: 1 }
     },
 
     player = new Player(dictionary.white),
-    ai = new Player(dictionary.black),
+    opponent = new Player(dictionary.black),
 
     game = {
         side: 0,
@@ -28,11 +29,9 @@ var dictionary = {
             }
 
             // kick off the AI, if its turn
-            if (ai.side === this.side) {
-                ai.centipawns += 100;
-                setTimeout(function () {
-                    ai.think();
-                }, 3000);
+            if (opponent.side === this.side) {
+                opponent.centipawns += 100;
+                opponent.think();
             } else {
                 player.centipawns += 100;
             }

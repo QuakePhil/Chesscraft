@@ -20,8 +20,14 @@ var dictionary = {
         centipawns: 0, // centipawns of dragged piece
         pieces: ['q', 'r', 'b', 'n', 'p'], // droppable pieces
 
-        makeMove: function () {
+        makeMove: function (move) {
             'use strict';
+            
+            if (typeof move.from !== 'undefined') {
+                game.board[move.from[0]][move.from[1]] = ' ';
+            }
+            game.board[move.to[0]][move.to[1]] = move.piece;
+
             if (this.side === 0) {
                 this.side = 1;
             } else {
@@ -36,7 +42,7 @@ var dictionary = {
                 player.centipawns += 100;
             }
 
-            this.drawInfo();
+            this.drawInterface(dictionary.white);
         },
 
         loadFEN: function (fen) {

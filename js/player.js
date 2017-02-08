@@ -51,7 +51,7 @@ Player.prototype.tryRayMove = function (ray, rankDelta, fileDelta, piece, rank, 
 
     while (this.tryMove(moves, {piece: piece, from: [rank, file], to: [toRank, toFile]})) {
         if (ray === false) { break; }
-        if (this.isCapture(moves[moves.length-1])) { break; }
+        if (this.isCapture(moves[moves.length - 1])) { break; }
         toRank = toRank + rankDelta;
         toFile = toFile + fileDelta;
     }
@@ -131,5 +131,5 @@ Player.prototype.think = function () {
         console.log(this.algebraic(moves[i]));
     }
 
-    game.makeMove();
+    game.makeMove(moves[0]);
 };

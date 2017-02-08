@@ -46,21 +46,18 @@ function drop(e) {
         return;
     }
 
-    // update board
-    piece = e.dataTransfer.getData('text').substring(4, 5);
-    game.board[rank][file] = piece;
-
     player.centipawns -= cp[e.dataTransfer.getData('text')];
 
     // update the UI
     className = 'square';
+    piece = e.dataTransfer.getData('text').substring(4, 5);
     if (e.target.className.indexOf('shade') !== -1) { className += ' shade'; }
     e.target.className = className + ' ' + piece;
 
-    game.makeMove();
+    game.makeMove({piece: piece, toPiece: ' ', to: [rank, file]});
 }
 
 //game.loadFEN('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
-game.loadFEN('3bk3/8/p7/rp6/rp6/p7/8/4K3 w - -');
-//game.loadFEN('4k3/8/8/8/8/8/8/4K3 w - -');
+//game.loadFEN('3bk3/8/p7/rp6/rp6/p7/8/4K3 w - -');
+game.loadFEN('4k3/8/8/8/8/8/8/4K3 w - -');
 game.drawInterface(dictionary.white);

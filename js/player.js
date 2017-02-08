@@ -15,8 +15,9 @@ Player.prototype.isCapture = function (move) {
 
 Player.prototype.algebraic = function (move) {
     'use strict';
-    return move.piece.toUpperCase()
-        + dictionary.files[move.from[1]] + dictionary.ranks[move.from[0]]
+
+    return (move.piece.toLowerCase() == 'p' ? '' : move.piece.toUpperCase())
+        + (typeof move.from !== 'undefined' ? (dictionary.files[move.from[1]] + dictionary.ranks[move.from[0]]) : '@')
         + (this.isCapture(move) ? 'x' : '')
         + dictionary.files[move.to[1]] + dictionary.ranks[move.to[0]];
 };
@@ -31,14 +32,14 @@ Player.prototype.myPiece = function (piece) {
 Player.prototype.tryMove = function (moves, move) {
     'use strict';
     var toPiece;
-    
+
     if (move.to[0] < 0 || move.to[0] >= game.ranks || move.to[1] < 0 || move.to[1] >= game.files) { return false; }
-    
+
     toPiece = game.board[move.to[0]][move.to[1]];
     if (game.board[move.to[0]][move.to[1]] !== ' ') {
         if (dictionary.pieces[move.piece] === dictionary.pieces[toPiece]) { return false; }
     }
-    
+
     move.toPiece = toPiece;
     moves.push(move);
     return true;
@@ -65,32 +66,32 @@ Player.prototype.pieceMoves = function (rank, file, moves) {
         diagonal = true;
         cardinal = true;
     }
-    
+
     if (piece.toLowerCase() === 'q') {
         diagonal = true;
         cardinal = true;
         ray = true;
     }
-    
+
     if (piece.toLowerCase() === 'r') {
         cardinal = true;
         ray = true;
     }
-    
+
     if (piece.toLowerCase() === 'b') {
         diagonal = true;
         ray = true;
     }
-    
+
     if (piece.toLowerCase() === 'n') {
-        this.tryMove(moves, {piece: piece, from: [rank, file], to: [rank + 1, file + 1]});
-        this.tryMove(moves, {piece: piece, from: [rank, file], to: [rank + 1, file]});
-        this.tryMove(moves, {piece: piece, from: [rank, file], to: [rank + 1, file - 1]});
-        this.tryMove(moves, {piece: piece, from: [rank, file], to: [rank, file + 1]});
-        this.tryMove(moves, {piece: piece, from: [rank, file], to: [rank, file - 1]});
-        this.tryMove(moves, {piece: piece, from: [rank, file], to: [rank - 1, file + 1]});
-        this.tryMove(moves, {piece: piece, from: [rank, file], to: [rank - 1, file]});
-        this.tryMove(moves, {piece: piece, from: [rank, file], to: [rank - 1, file - 1]});
+        this.tryMove(moves, {piece: piece, from: [rank, file], to: [rank + 2, file + 1]});
+        this.tryMove(moves, {piece: piece, from: [rank, file], to: [rank - 2, file + 1]});
+        this.tryMove(moves, {piece: piece, from: [rank, file], to: [rank + 2, file - 1]});
+        this.tryMove(moves, {piece: piece, from: [rank, file], to: [rank - 2, file - 1]});
+        this.tryMove(moves, {piece: piece, from: [rank, file], to: [rank + 1, file + 2]});
+        this.tryMove(moves, {piece: piece, from: [rank, file], to: [rank - 1, file + 2]});
+        this.tryMove(moves, {piece: piece, from: [rank, file], to: [rank + 1, file - 2]});
+        this.tryMove(moves, {piece: piece, from: [rank, file], to: [rank - 1, file - 2]});
     }
 
     if (diagonal) {
@@ -131,5 +132,5 @@ Player.prototype.think = function () {
         console.log(this.algebraic(moves[i]));
     }
 
-    game.makeMove(moves[0]);
+    //game.makeMove(moves[0]);
 };

@@ -8,7 +8,35 @@ div {
   align-items: center;
 }
 
-#info {
+
+.container-popup {
+    position: relative;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: rgba(0,0,0,.8);
+}
+
+.popup {
+    width: 50%;
+    height: 50%;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+}
+
+#help {
+  background-image: none, url('../help.png');
+  width: 562px;
+  height: 406px;
+}
+
+#info, #moves {
   height: 50px;
   overflow-y: scroll;
 }

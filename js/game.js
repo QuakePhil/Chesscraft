@@ -18,6 +18,7 @@ var dictionary = {
 
     player = new Player(dictionary.white),
     opponent = new Player(dictionary.black),
+    moves = [],
 
     dropMove = false, // to track where we can drag/drop in main.js
     game = {
@@ -30,7 +31,9 @@ var dictionary = {
 
         makeMove: function (move) {
             'use strict';
-            
+
+            this.moves.push(move);
+
             if (typeof move.from !== 'undefined') {
                 game.board[move.from[0]][move.from[1]] = ' ';
             }
@@ -73,6 +76,7 @@ var dictionary = {
                 this.board.push(rankArray);
             }
             this.side = 1; // should come from fen
+            this.moves = [];
         },
 
         squareClasses: function (piece, shade) {
@@ -82,6 +86,16 @@ var dictionary = {
             }
 
             return (shade ? 'square shade' : 'square') + ' ' + piece;
+        },
+
+        drawMoves: function () {
+            'use strict';
+            var i, separator = '', moves = '';
+            for (i = 0; i < this.moves.length; ++i) {
+                moves += separator + player.algebraic(this.moves[i]);
+                separator = ', ';
+            }
+            document.getElementById('moves').innerHTML = moves;
         },
 
         drawInfo: function () {
@@ -129,7 +143,11 @@ var dictionary = {
             // piece drop interface
             pieces = '<table cellpadding="0" cellspacing="0" border="0"><tr>';
             for (file = 0; file < this.pieces.length; ++file) {
-                thisPiece = this.pieces[file].toUpperCase();
+                if (fromSide === dictionary.black) {
+                    thisPiece = this.pieces[file].toLowerCase();
+                } else {
+                    thisPiece = this.pieces[file].toUpperCase();
+                }
                 pieces += '<td id="drop' + thisPiece + '" draggable="true" ondragstart="drag(event)" class="' +
                     this.squareClasses(thisPiece, game.side === player.side) + '"></td>';
             }
@@ -142,5 +160,6 @@ var dictionary = {
             'use strict';
             this.drawBoard(fromSide);
             this.drawInfo();
+            this.drawMoves();
         }
     };

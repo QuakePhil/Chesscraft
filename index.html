@@ -16,9 +16,13 @@
 </head>
 
 <body>
-<div id="info"></div>
-<div id="board"></div>
-<div id="pieces"></div>
+  <div class="container-popup" id="help-div">
+    <div class="popup" id="help" onclick="return document.body.removeChild(document.getElementById('help-div'))"></div>
+  </div>
+  <div id="info"></div>
+  <div id="board"></div>
+  <div id="pieces"></div>
+  <div id="moves"></div>
   <script src="js/player.js"></script>
   <script src="js/game.js"></script>
   <script src="js/main.js"></script>

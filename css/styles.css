@@ -1,15 +1,16 @@
 /* styles */
 
 div {
-  width: 100%;
-  display: flex;
-  text-align: center;
-  justify-content: center;
-  align-items: center;
+    width: 100%;
+    display: flex;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
 }
 
 
 .container-popup {
+    display: none;
     position: relative;
     position: fixed;
     top: 0;
@@ -31,30 +32,30 @@ div {
 }
 
 #help {
-  background-image: none, url('../help.png');
-  width: 562px;
-  height: 406px;
+    background-image: none, url('../help.png');
+    width: 562px;
+    height: 406px;
 }
 
 #info, #moves {
-  height: 50px;
-  overflow-y: scroll;
+    height: 50px;
+    overflow-y: scroll;
 }
 
 #pieces {
-  padding-top: 25px;
+    padding-top: 25px;
 }
 
 .square {
-  width: 45px;
-  height: 45px;
-  background-position: 50% 50%;
-  background-repeat: no-repeat;
-  background-color: #aaa;
+    width: 45px;
+    height: 45px;
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    background-color: #aaa;
 }
 
 .shade {
-  background-color: #ddd;
+    background-color: #ddd;
 }
 
 .k { background-image: none, url('Chess_kdt45.svg'); }

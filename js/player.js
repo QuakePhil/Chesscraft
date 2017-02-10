@@ -5,6 +5,7 @@ function Player(side) {
     'use strict';
     this.side = side;
     this.centipawns = 100;
+    this.noDepth = false;
 }
 
 Player.prototype.isCapture = function (move) {
@@ -16,22 +17,30 @@ Player.prototype.isCapture = function (move) {
 Player.prototype.algebraic = function (move) {
     'use strict';
 
-    return (move.piece.toLowerCase() == 'p' ? '' : move.piece.toUpperCase())
+    return (move.piece.toLowerCase() === 'p' ? '' : move.piece.toUpperCase())
         + (typeof move.from !== 'undefined' ? (dictionary.files[move.from[1]] + dictionary.ranks[move.from[0]]) : '@')
         + (this.isCapture(move) ? 'x' : '')
         + dictionary.files[move.to[1]] + dictionary.ranks[move.to[0]];
 };
 
-Player.prototype.myPiece = function (piece) {
+Player.prototype.isPiece = function (piece) {
+    'use strict';
+    var pieceColor = dictionary.pieces[piece];
+    if (typeof pieceColor !== undefined) { return true; }
+    return false;
+};
+
+Player.prototype.isMyPiece = function (piece) {
     'use strict';
     var pieceColor = dictionary.pieces[piece];
     if (pieceColor === this.side) { return true; }
     return false;
 };
 
+// add move to moves if legal
 Player.prototype.tryMove = function (moves, move) {
     'use strict';
-    var toPiece;
+    var i, toPiece, opponentMoves, validMove = true;
 
     if (move.to[0] < 0 || move.to[0] >= game.ranks || move.to[1] < 0 || move.to[1] >= game.files) { return false; }
 
@@ -39,6 +48,22 @@ Player.prototype.tryMove = function (moves, move) {
     if (game.board[move.to[0]][move.to[1]] !== ' ') {
         if (dictionary.pieces[move.piece] === dictionary.pieces[toPiece]) { return false; }
     }
+
+    // if this move puts me (or keeps me) in check, skip
+    if (this.side === game.side && this.noDepth === false) {
+        game.makeMove(move);
+        game.opponent(this.side).noDepth = true;
+        opponentMoves = game.opponent(this.side).moves();
+        for (i = 0; i < opponentMoves.length; ++i) {
+            if (opponentMoves[i].toPiece.toLowerCase() === 'k') {
+                // moves that place us in check are invalid
+                validMove = false;
+            }
+        }
+        game.unmakeMove();
+    }
+
+    if (!validMove) { return false; }
 
     move.toPiece = toPiece;
     moves.push(move);
@@ -113,9 +138,10 @@ Player.prototype.moves = function () {
     'use strict';
     var rank, file, moves = [];
 
+    // now get the moves for my pieces...
     for (file = 0; file < game.files; ++file) {
         for (rank = 0; rank < game.ranks; ++rank) {
-            if (this.myPiece(game.board[rank][file])) {
+            if (this.isMyPiece(game.board[rank][file])) {
                 this.pieceMoves(rank, file, moves);
             }
         }
@@ -128,9 +154,13 @@ Player.prototype.think = function () {
     'use strict';
     var i, moves = this.moves(this.side);
 
+    console.log('Moves:');
     for (i = 0; i < moves.length; ++i) {
         console.log(this.algebraic(moves[i]));
     }
 
-    //game.makeMove(moves[0]);
+    // make the first move (essentially at random)
+    // need to sort moves by heuristic, and perform some sort of depth search
+    game.makeMove(moves[0]);
+    game.prepareUIForNextMove();
 };

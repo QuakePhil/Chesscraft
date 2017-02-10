@@ -1,5 +1,5 @@
 /*jslint plusplus: true */
-/*global Player*/
+/*global Player, console*/
 
 var dictionary = {
         black: 0,
@@ -25,25 +25,13 @@ var dictionary = {
         side: 0,
         files: 0,
         ranks: 0,
+        previousState: [{}], // for unmakeMove, keyed by depth
         board: '',
         centipawns: 0, // centipawns of dragged piece
         pieces: ['q', 'r', 'b', 'n', 'p'], // droppable pieces
 
-        makeMove: function (move) {
+        prepareUIForNextMove: function () {
             'use strict';
-
-            this.moves.push(move);
-
-            if (typeof move.from !== 'undefined') {
-                game.board[move.from[0]][move.from[1]] = ' ';
-            }
-            game.board[move.to[0]][move.to[1]] = move.piece;
-
-            if (this.side === 0) {
-                this.side = 1;
-            } else {
-                this.side = 0;
-            }
 
             // kick off the AI, if its turn
             if (opponent.side === this.side) {
@@ -55,7 +43,68 @@ var dictionary = {
 
             this.drawInterface(dictionary.white);
         },
+        
+        makeMove: function (move, depth) {
+            'use strict';
+            if (typeof depth === 'undefined') { depth = 0; }
 
+            // .slice() doesn't seem deep enough for my multi-dimensional array
+            this.previousState[depth].board = JSON.parse(JSON.stringify(this.board));
+            this.previousState[depth].side = this.side;
+
+            this.moves.push(move);
+
+            if (typeof move.from !== 'undefined') {
+                this.board[move.from[0]][move.from[1]] = ' ';
+            }
+            this.board[move.to[0]][move.to[1]] = move.piece; // need to also save ep square, castling, side, etc
+
+            if (this.side === 0) {
+                this.side = 1;
+            } else {
+                this.side = 0;
+            }
+        },
+
+        unmakeMove: function (depth) {
+            'use strict';
+            if (typeof depth === 'undefined') { depth = 0; }
+
+            this.board = JSON.parse(JSON.stringify(this.previousState[depth].board));
+            this.side = this.previousState[depth].side;
+
+            // also clean up this.moves array
+        },
+
+        opponent: function (side) {
+            'use strict';
+            if (player.side === side) {
+                return opponent;
+            }
+            return player;
+        },
+        
+        dumpBoard: function (instance) {
+            'use strict';
+            var file, rank, line;
+
+            if (typeof instance === 'undefined') {
+                instance = {};
+                instance.board = this.board;
+                instance.side = this.side;
+            }
+
+            console.log('Side to move: ' + this.side);
+
+            for (file = 0; file < this.files; ++file) {
+                line = String(file) + ' - ';
+                for (rank = 0; rank < this.ranks; ++rank) {
+                    line = line + '[' + this.board[file][rank] + ']';
+                }
+                console.log(line);
+            }
+        },
+        
         loadFEN: function (fen) {
             'use strict';
             var file, rank, rankArray, slashes = 0;
@@ -67,9 +116,9 @@ var dictionary = {
             fen = fen.replace(/8/g, '        ').replace(/7/g, '       ').replace(/6/g, '      ')
                 .replace(/5/g, '     ').replace(/4/g, '    ').replace(/3/g, '   ').replace(/2/g, '  ').replace(/1/g, ' ');
 
-            for (file = 0; file < game.files; ++file) {
+            for (file = 0; file < this.files; ++file) {
                 rankArray = [];
-                for (rank = 0; rank < game.ranks; ++rank) {
+                for (rank = 0; rank < this.ranks; ++rank) {
                     rankArray.push(fen.substring((file * this.ranks) + rank + slashes, (file * this.ranks) + rank + slashes + 1));
                 }
                 slashes++;
@@ -77,6 +126,12 @@ var dictionary = {
             }
             this.side = 1; // should come from fen
             this.moves = [];
+        },
+
+        testAI: function () {
+            'use strict';
+            opponent.think();
+            this.drawInterface(dictionary.white);
         },
 
         squareClasses: function (piece, shade) {
@@ -103,7 +158,7 @@ var dictionary = {
             // info board
             document.getElementById('info').innerHTML = 'Centipawns: ' + player.centipawns + '<br/>' +
                 'Player: ' + (player.side === dictionary.white ? 'white' : 'black') + '<br/>' +
-                'Turn: ' + (game.side === dictionary.white ? 'white' : 'black');
+                'Turn: ' + (this.side === dictionary.white ? 'white' : 'black');
         },
 
         drawBoard: function (fromSide) {
@@ -113,14 +168,14 @@ var dictionary = {
                 sequence = 0, board = '<table cellpadding="0" cellspacing="0" border="0">';
 
             board += '<tr><td></td>';
-            for (file = 0; file < game.files; ++file) {
+            for (file = 0; file < this.files; ++file) {
                 board += '<td>' + dictionary.files[file] + '</td>';
             }
             board += '<td></td></tr>';
 
-            for (rank = 0; rank < game.ranks; ++rank) {
+            for (rank = 0; rank < this.ranks; ++rank) {
                 board += '<tr><td>' + dictionary.ranks[rank] + '</td>';
-                for (file = 0; file < game.files; ++file) {
+                for (file = 0; file < this.files; ++file) {
                     classes = this.squareClasses(
                         this.board[rank][file],
                         ((file + rank) % 2 === 0)
@@ -132,7 +187,7 @@ var dictionary = {
             }
 
             board += '<tr><td></td>';
-            for (file = 0; file < game.files; ++file) {
+            for (file = 0; file < this.files; ++file) {
                 board += '<td>' + dictionary.files[file] + '</td>';
             }
             board += '<td></td></tr>';
@@ -149,7 +204,7 @@ var dictionary = {
                     thisPiece = this.pieces[file].toUpperCase();
                 }
                 pieces += '<td id="drop' + thisPiece + '" draggable="true" ondragstart="drag(event)" class="' +
-                    this.squareClasses(thisPiece, game.side === player.side) + '"></td>';
+                    this.squareClasses(thisPiece, this.side === player.side) + '"></td>';
             }
 
             pieces += '</tr></table>';

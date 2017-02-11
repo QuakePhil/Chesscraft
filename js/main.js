@@ -28,7 +28,7 @@ function drop(e) {
     var i, className, piece, square, rank, file,
         source = e.dataTransfer.getData('text'), sourceSquare, sourceRank, sourceFile;
 
-    if (source.substring(0,4) === 'drop') {
+    if (source.substring(0, 4) === 'drop') {
         // validate the move
         square = parseInt(e.target.id.substring(6), 10);
         rank = parseInt(square / game.ranks, 10);
@@ -50,7 +50,7 @@ function drop(e) {
         game.makeMove({piece: piece, toPiece: ' ', to: [rank, file]});
         game.prepareUIForNextMove();
 
-    } else if (source.substring(0,6) === 'square') {
+    } else if (source.substring(0, 6) === 'square') {
         square = parseInt(e.target.id.substring(6), 10);
         rank = parseInt(square / game.ranks, 10);
         file = square % game.files;
@@ -59,12 +59,12 @@ function drop(e) {
         sourceFile = sourceSquare % game.files;
         for (i = 0; i < game.playerMoves.length; ++i) {
             if (game.playerMoves[i].from[0] === sourceRank &&
-                game.playerMoves[i].from[1] === sourceFile &&
-                game.playerMoves[i].to[0] === rank &&
-                game.playerMoves[i].to[1] === file) {
-                    game.makeMove(game.playerMoves[i]);
-                    game.prepareUIForNextMove();
-                    break;
+                    game.playerMoves[i].from[1] === sourceFile &&
+                    game.playerMoves[i].to[0] === rank &&
+                    game.playerMoves[i].to[1] === file) {
+                game.makeMove(game.playerMoves[i]);
+                game.prepareUIForNextMove();
+                break;
             }
         }
     }

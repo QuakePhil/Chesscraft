@@ -5,6 +5,7 @@ var dictionary = {
         black: 0,
         white: 1,
         files: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'],
+        file2int: {'-': -1, 'a': 0, 'b': 1, 'c': 2, 'd': 3, 'e': 4, 'f': 5, 'g': 6, 'h': 7},
         ranks: ['8', '7', '6', '5', '4', '3', '2', '1'],
         pieces: {k: 0, q: 0, r: 0, b: 0, n: 0, p: 0, K: 1, Q: 1, R: 1, B: 1, N: 1, P: 1 },
         cp: {
@@ -19,6 +20,7 @@ var dictionary = {
     player = new Player(dictionary.white),
     opponent = new Player(dictionary.black),
     moves = [],
+    enPassant = -1, // en passant file
 
     dropMove = false, // to track where we can drag/drop in main.js
     game = {
@@ -51,8 +53,13 @@ var dictionary = {
             // .slice() doesn't seem deep enough for my multi-dimensional array
             this.previousState[depth].board = JSON.parse(JSON.stringify(this.board));
             this.previousState[depth].side = this.side;
+            this.previousState[depth].enPassant = this.enPassant;
 
             this.moves.push(move);
+    
+            if (typeof move.enPassant !== 'undefined') {
+                this.enPassant = move.enPassant;
+            }
 
             if (typeof move.from !== 'undefined') {
                 this.board[move.from[0]][move.from[1]] = ' ';
@@ -72,8 +79,9 @@ var dictionary = {
 
             this.board = JSON.parse(JSON.stringify(this.previousState[depth].board));
             this.side = this.previousState[depth].side;
+            this.enPassant = this.previousState[depth].enPassant;
 
-            // also clean up this.moves array
+            this.moves.pop();
         },
 
         opponent: function (side) {
@@ -107,7 +115,7 @@ var dictionary = {
         
         loadFEN: function (fen) {
             'use strict';
-            var file, rank, rankArray, slashes = 0;
+            var file, rank, rankArray, slashes = 0, parts = fen.split(' ');
 
             // load fen here
             this.files = 8;
@@ -124,7 +132,10 @@ var dictionary = {
                 slashes++;
                 this.board.push(rankArray);
             }
-            this.side = 1; // should come from fen
+            this.side = (parts[1] === 'w' ? dictionary.white : dictionary.black);
+            // castling = parts[2] // KQkq
+            this.enPassant = dictionary.file2int[parts[3].substring(0, 1)];
+            console.log(this.enPassant);
             this.moves = [];
         },
 

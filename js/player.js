@@ -11,6 +11,7 @@ function Player(side) {
 Player.prototype.isCapture = function (move) {
     'use strict';
     if (typeof move === 'undefined') { return false; }
+    if (typeof move.toPiece === 'undefined') { return false; }
     return (move.toPiece !== ' ' && dictionary.pieces[move.piece] !== dictionary.pieces[move.toPiece]);
 };
 
@@ -19,8 +20,8 @@ Player.prototype.algebraic = function (move) {
 
     return (move.piece.toLowerCase() === 'p' ? '' : move.piece.toUpperCase())
         + (typeof move.from !== 'undefined' ? (dictionary.files[move.from[1]] + dictionary.ranks[move.from[0]]) : '@')
-        + (this.isCapture(move) ? 'x' : '')
-        + dictionary.files[move.to[1]] + dictionary.ranks[move.to[0]];
+        + (this.isCapture(move) ? 'x': '')
+        + (typeof move.to !== 'undefined' ? dictionary.files[move.to[1]] + dictionary.ranks[move.to[0]] : '');
 };
 
 Player.prototype.isPiece = function (piece) {
@@ -45,6 +46,11 @@ Player.prototype.tryMove = function (moves, move) {
     if (move.to[0] < 0 || move.to[0] >= game.ranks || move.to[1] < 0 || move.to[1] >= game.files) { return false; }
 
     toPiece = game.board[move.to[0]][move.to[1]];
+    // we don't need to do extended lookup for enpassant check, but when
+    // we fix the noDepth hack, this needs to be redone as part of it
+    if (game.enPassant === move.enPassant && this.noDepth === false) {
+        toPiece = (move.piece === 'P' ? 'p' : 'P');
+    }
     if (game.board[move.to[0]][move.to[1]] !== ' ') {
         if (dictionary.pieces[move.piece] === dictionary.pieces[toPiece]) { return false; }
     }
@@ -52,7 +58,7 @@ Player.prototype.tryMove = function (moves, move) {
     // if this move puts me (or keeps me) in check, skip
     if (this.side === game.side && this.noDepth === false) {
         game.makeMove(move);
-        game.opponent(this.side).noDepth = true;
+        game.opponent(this.side).noDepth = true; // fix this hack... this.side === game.side should be enough, no?
         opponentMoves = game.opponent(this.side).moves();
         for (i = 0; i < opponentMoves.length; ++i) {
             if (opponentMoves[i].toPiece.toLowerCase() === 'k') {
@@ -85,7 +91,7 @@ Player.prototype.tryRayMove = function (ray, rankDelta, fileDelta, piece, rank, 
 
 Player.prototype.pieceMoves = function (rank, file, moves) {
     'use strict';
-    var piece = game.board[rank][file], ray = false, diagonal = false, cardinal = false;
+    var piece = game.board[rank][file], ray = false, diagonal = false, cardinal = false, pawnDirection, pawnRank;
 
     if (piece.toLowerCase() === 'k') {
         diagonal = true;
@@ -117,6 +123,29 @@ Player.prototype.pieceMoves = function (rank, file, moves) {
         this.tryMove(moves, {piece: piece, from: [rank, file], to: [rank - 1, file + 2]});
         this.tryMove(moves, {piece: piece, from: [rank, file], to: [rank + 1, file - 2]});
         this.tryMove(moves, {piece: piece, from: [rank, file], to: [rank - 1, file - 2]});
+    }
+
+    if (piece.toLowerCase() === 'p') {
+        pawnDirection = 1;
+        pawnRank = 1;
+        if (this.side === dictionary.white) {
+            pawnDirection = -1;
+            pawnRank = 6;
+        }
+
+        // diagonal pawn moves must be captures
+        this.tryMove(moves, { enPassant: file + 1, piece: piece, from: [rank, file], to: [rank + pawnDirection, file + 1]});
+        if (!this.isCapture(moves[moves.length - 1])) { moves.pop(); }
+        this.tryMove(moves, { enPassant: file - 1, piece: piece, from: [rank, file], to: [rank + pawnDirection, file - 1]});
+        if (!this.isCapture(moves[moves.length - 1])) { moves.pop(); }
+
+        // pawn pushes must not be captures
+        if (rank === pawnRank && game.board[rank + pawnDirection][file] === ' ') {
+            this.tryMove(moves, {piece: piece, from: [rank, file], to: [rank + pawnDirection + pawnDirection, file]});
+            if (this.isCapture(moves[moves.length - 1])) { moves.pop(); }
+        }
+        this.tryMove(moves, {piece: piece, from: [rank, file], to: [rank + pawnDirection, file]});
+        if (this.isCapture(moves[moves.length - 1])) { moves.pop(); }
     }
 
     if (diagonal) {
@@ -161,6 +190,6 @@ Player.prototype.think = function () {
 
     // make the first move (essentially at random)
     // need to sort moves by heuristic, and perform some sort of depth search
-    game.makeMove(moves[0]);
-    game.prepareUIForNextMove();
+    //game.makeMove(moves[0]);
+    //game.prepareUIForNextMove();
 };

@@ -172,10 +172,6 @@ var dictionary = {
 
             if (typeof this.player !== 'undefined' && this.side === this.player.side) {
                 this.playerMoves = this.player.moves();
-                console.log('My moves:');
-                for (i = 0; i < this.playerMoves.length; ++i) {
-                    console.log(this.player.algebraic(this.playerMoves[i]));
-                }
             }
             
             ranks = '<tr><td></td>';

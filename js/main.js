@@ -50,7 +50,7 @@ function drop(e) {
         game.makeMove({piece: piece, toPiece: ' ', to: [rank, file]});
         game.prepareUIForNextMove();
 
-    } else if (source.substring(0, 6) === 'square') {
+    } else {
         square = parseInt(e.target.id.substring(6), 10);
         rank = parseInt(square / game.ranks, 10);
         file = square % game.files;

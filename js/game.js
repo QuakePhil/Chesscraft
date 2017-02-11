@@ -135,7 +135,6 @@ var dictionary = {
             this.side = (parts[1] === 'w' ? dictionary.white : dictionary.black);
             // castling = parts[2] // KQkq
             this.enPassant = dictionary.file2int[parts[3].substring(0, 1)];
-            console.log(this.enPassant);
             this.moves = [];
         },
 

@@ -48,8 +48,8 @@ function drop(e) {
 
 //game.loadFEN('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
 //game.loadFEN('3bk3/8/p7/rp2n3/rp6/p7/8/4K3 w - -');
-game.loadFEN('4k3/3ppp2/8/1PpP4/8/8/8/4K3 w - c6');
-//game.loadFEN('8/8/8/8/8/4k3/8/4K3 w - -');
+//game.loadFEN('4k3/3ppp2/8/1PpP4/8/8/8/4K3 w - c6');
+game.loadFEN('4k3/8/8/8/8/8/8/4K3 w - -');
 game.drawInterface(dictionary.white);
 //game.testAI();
-player.think();
+//player.think();

@@ -190,6 +190,6 @@ Player.prototype.think = function () {
 
     // make the first move (essentially at random)
     // need to sort moves by heuristic, and perform some sort of depth search
-    //game.makeMove(moves[0]);
-    //game.prepareUIForNextMove();
+    game.makeMove(moves[0]);
+    game.prepareUIForNextMove();
 };

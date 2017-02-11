@@ -17,12 +17,6 @@ var dictionary = {
         }
     },
 
-    player = new Player(dictionary.white),
-    opponent = new Player(dictionary.black),
-    moves = [],
-    enPassant = -1, // en passant file
-
-    dropMove = false, // to track where we can drag/drop in main.js
     game = {
         side: 0,
         files: 0,
@@ -32,15 +26,22 @@ var dictionary = {
         centipawns: 0, // centipawns of dragged piece
         pieces: ['q', 'r', 'b', 'n', 'p'], // droppable pieces
 
+        player: new Player(dictionary.white),
+        opponent: new Player(dictionary.black),
+        playerMoves: [], // used to keep track of dnd for user's moves
+        playerDropping: false, // used to check for resources during piece dropping
+        moves: [], // history of all moves
+        enPassant: -1, // en passant file
+        
         prepareUIForNextMove: function () {
             'use strict';
 
             // kick off the AI, if its turn
-            if (opponent.side === this.side) {
-                opponent.centipawns += 100;
-                opponent.think();
+            if (this.opponent.side === this.side) {
+                this.opponent.centipawns += 100;
+                this.opponent.think();
             } else {
-                player.centipawns += 100;
+                this.player.centipawns += 100;
             }
 
             this.drawInterface(dictionary.white);
@@ -82,14 +83,6 @@ var dictionary = {
             this.enPassant = this.previousState[depth].enPassant;
 
             this.moves.pop();
-        },
-
-        opponent: function (side) {
-            'use strict';
-            if (player.side === side) {
-                return opponent;
-            }
-            return player;
         },
         
         dumpBoard: function (instance) {
@@ -140,7 +133,7 @@ var dictionary = {
 
         testAI: function () {
             'use strict';
-            opponent.think();
+            this.opponent.think();
             this.drawInterface(dictionary.white);
         },
 
@@ -157,7 +150,7 @@ var dictionary = {
             'use strict';
             var i, separator = '', moves = '';
             for (i = 0; i < this.moves.length; ++i) {
-                moves += separator + player.algebraic(this.moves[i]);
+                moves += separator + this.player.algebraic(this.moves[i]);
                 separator = ', ';
             }
             document.getElementById('moves').innerHTML = moves;
@@ -166,22 +159,31 @@ var dictionary = {
         drawInfo: function () {
             'use strict';
             // info board
-            document.getElementById('info').innerHTML = 'Centipawns: ' + player.centipawns + '<br/>' +
-                'Player: ' + (player.side === dictionary.white ? 'white' : 'black') + '<br/>' +
+            document.getElementById('info').innerHTML = 'Centipawns: ' + this.player.centipawns + '<br/>' +
+                'Player: ' + (this.player.side === dictionary.white ? 'white' : 'black') + '<br/>' +
                 'Turn: ' + (this.side === dictionary.white ? 'white' : 'black');
         },
 
         drawBoard: function (fromSide) {
             'use strict';
             // also blah = document.createElement('tagname'); blah.attr = val; ...
-            var pieces, thisPiece, rank, file, classes,
-                sequence = 0, board = '<table cellpadding="0" cellspacing="0" border="0">';
+            var i, pieces, thisPiece, rank, file, classes, draggable, moves, sequence = 0,
+                board = '<table cellpadding="0" cellspacing="0" border="0">', ranks;
 
-            board += '<tr><td></td>';
-            for (file = 0; file < this.files; ++file) {
-                board += '<td>' + dictionary.files[file] + '</td>';
+            if (typeof this.player !== 'undefined' && this.side === this.player.side) {
+                this.playerMoves = this.player.moves();
+                console.log('My moves:');
+                for (i = 0; i < this.playerMoves.length; ++i) {
+                    console.log(this.player.algebraic(this.playerMoves[i]));
+                }
             }
-            board += '<td></td></tr>';
+            
+            ranks = '<tr><td></td>';
+            for (file = 0; file < this.files; ++file) {
+                ranks += '<td>' + dictionary.files[file] + '</td>';
+            }
+            ranks += '<td></td></tr>';
+            board += ranks;
 
             for (rank = 0; rank < this.ranks; ++rank) {
                 board += '<tr><td>' + dictionary.ranks[rank] + '</td>';
@@ -190,17 +192,23 @@ var dictionary = {
                         this.board[rank][file],
                         ((file + rank) % 2 === 0)
                     );
-                    board += '<td id="square' + sequence + '" class="' + classes + '" ondrop="drop(event)" ondragover="allowDrop(event)"></td>';
+                    
+                    draggable = '';
+                    for (i = 0; i < this.playerMoves.length; ++i) {
+                        if (this.playerMoves[i].from[0] === rank && this.playerMoves[i].from[1] === file) {
+                            draggable = ' draggable="true" ondragstart="drag(event)"';
+                            break;
+                        }
+                    }
+                    
+                    board += '<td id="square' + sequence + '" class="' + classes + '" '
+                        + draggable + 'ondrop="drop(event)" ondragover="allowDrop(event)"></td>';
                     sequence++;
                 }
                 board += '<td>' + dictionary.ranks[rank] + '</td></tr>';
             }
 
-            board += '<tr><td></td>';
-            for (file = 0; file < this.files; ++file) {
-                board += '<td>' + dictionary.files[file] + '</td>';
-            }
-            board += '<td></td></tr>';
+            board += ranks;
 
             board += '</table>';
             document.getElementById('board').innerHTML = board;
@@ -214,7 +222,7 @@ var dictionary = {
                     thisPiece = this.pieces[file].toUpperCase();
                 }
                 pieces += '<td id="drop' + thisPiece + '" draggable="true" ondragstart="drag(event)" class="' +
-                    this.squareClasses(thisPiece, this.side === player.side) + '"></td>';
+                    this.squareClasses(thisPiece, this.side === this.player.side) + '"></td>';
             }
 
             pieces += '</tr></table>';

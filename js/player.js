@@ -5,7 +5,7 @@ function Player(side) {
     'use strict';
     this.side = side;
     this.centipawns = 100;
-    this.noDepth = false;
+    this.noDepth = false; // a moves-related property, needs to be re-factored...
 }
 
 Player.prototype.isCapture = function (move) {
@@ -20,7 +20,7 @@ Player.prototype.algebraic = function (move) {
 
     return (move.piece.toLowerCase() === 'p' ? '' : move.piece.toUpperCase())
         + (typeof move.from !== 'undefined' ? (dictionary.files[move.from[1]] + dictionary.ranks[move.from[0]]) : '@')
-        + (this.isCapture(move) ? 'x': '')
+        + (this.isCapture(move) ? 'x' : '')
         + (typeof move.to !== 'undefined' ? dictionary.files[move.to[1]] + dictionary.ranks[move.to[0]] : '');
 };
 
@@ -36,6 +36,14 @@ Player.prototype.isMyPiece = function (piece) {
     var pieceColor = dictionary.pieces[piece];
     if (pieceColor === this.side) { return true; }
     return false;
+};
+
+Player.prototype.opponent = function () {
+    'use strict';
+    if (game.player.side === this.side) {
+        return game.opponent;
+    }
+    return game.player;
 };
 
 // add move to moves if legal
@@ -58,8 +66,8 @@ Player.prototype.tryMove = function (moves, move) {
     // if this move puts me (or keeps me) in check, skip
     if (this.side === game.side && this.noDepth === false) {
         game.makeMove(move);
-        game.opponent(this.side).noDepth = true; // fix this hack... this.side === game.side should be enough, no?
-        opponentMoves = game.opponent(this.side).moves();
+        this.opponent().noDepth = true; // fix this hack... this.side === game.side should be enough, no?
+        opponentMoves = this.opponent().moves();
         for (i = 0; i < opponentMoves.length; ++i) {
             if (opponentMoves[i].toPiece.toLowerCase() === 'k') {
                 // moves that place us in check are invalid

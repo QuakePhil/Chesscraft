@@ -1,10 +1,13 @@
 /*jslint plusplus: true */
-/*global player, game, dictionary, console*/
+/*global game, dictionary, console*/
 
 function allowDrop(e) {
     'use strict';
-    if (player.side !== game.side) { return false; }
-    if (player.centipawns < game.centipawns) { return false; }
+    console.log(e.target.id, e.dataTransfer.getData('text'));
+    // todo: detect above getData, if drop do below code, if square do regular move (new code)
+
+    if (game.player.side !== game.side) { return false; }
+    if (game.player.centipawns < game.centipawns) { return false; }
 
     // disallow for any but the first 2 ranks
     if (parseInt(e.target.id.substring(6), 10) < 48) { return false; }
@@ -22,6 +25,9 @@ function drop(e) {
     'use strict';
     e.preventDefault();
 
+    // console.log(e.target.id, e.dataTransfer.getData('text'));
+    // todo: detect above getData, if drop do below code, if square do regular move (new code)
+
     // validate the move
     var className,
         piece,
@@ -34,7 +40,7 @@ function drop(e) {
         return;
     }
 
-    player.centipawns -= dictionary.cp[e.dataTransfer.getData('text')];
+    game.player.centipawns -= dictionary.cp[e.dataTransfer.getData('text')];
 
     // update the UI
     className = 'square';

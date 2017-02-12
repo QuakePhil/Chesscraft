@@ -41,15 +41,13 @@ function drop(e) {
             return;
         }
 
-        game.player.centipawns -= dictionary.cp[source];
-
         // update the UI
         className = 'square';
         piece = e.dataTransfer.getData('text').substring(4, 5);
         if (e.target.className.indexOf('shade') !== -1) { className += ' shade'; }
         e.target.className = className + ' ' + piece;
 
-        game.makeMove({piece: piece, toPiece: ' ', to: [rank, file]});
+        game.makeMove({dropCost: dictionary.cp[source], piece: piece, toPiece: ' ', to: [rank, file]});
         game.prepareUIForNextMove();
 
     } else {
@@ -60,7 +58,8 @@ function drop(e) {
         sourceRank = parseInt(sourceSquare / game.ranks, 10);
         sourceFile = sourceSquare % game.files;
         for (i = 0; i < game.playerMoves.length; ++i) {
-            if (game.playerMoves[i].from[0] === sourceRank &&
+            if (typeof game.playerMoves[i].from !== 'undefined' && // skip generated drop moves, they're handled above
+                    game.playerMoves[i].from[0] === sourceRank &&
                     game.playerMoves[i].from[1] === sourceFile &&
                     game.playerMoves[i].to[0] === rank &&
                     game.playerMoves[i].to[1] === file) {
@@ -74,8 +73,8 @@ function drop(e) {
 
 //game.loadFEN('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
 //game.loadFEN('3bk3/8/p7/rp2n3/rp6/p7/8/4K3 w - -');
-//game.loadFEN('4k3/3ppp2/8/1PpP4/8/8/8/4K3 w - c6');
-game.loadFEN('8/8/8/8/8/4k3/8/4K3 w - -');
+//game.loadFEN('4k3/3ppp2/8/1PpP4/8/8/8/4K2R w - c6');
+game.loadFEN('4k3/8/8/8/8/8/8/4K3 w - -');
 game.drawInterface(dictionary.white);
 //game.testAI();
 //game.player.think();

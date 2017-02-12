@@ -58,6 +58,15 @@ var dictionary = {
 
             this.moves.push(move);
     
+            if (typeof move.dropCost !== 'undefined') {
+                if (this.side === this.player.side) {
+                    this.player.centipawns -= move.dropCost;
+                }
+                if (this.side === this.opponent.side) {
+                    this.opponent.centipawns -= move.dropCost;
+                }
+            }
+
             if (typeof move.enPassant !== 'undefined') {
                 this.enPassant = move.enPassant;
             }
@@ -159,7 +168,8 @@ var dictionary = {
         drawInfo: function () {
             'use strict';
             // info board
-            document.getElementById('info').innerHTML = 'Centipawns: ' + this.player.centipawns + '<br/>' +
+            document.getElementById('info').innerHTML = 'Player cp: ' + this.player.centipawns +
+                ', Opponent cp: ' + this.opponent.centipawns + '<br/>' +
                 'Player: ' + (this.player.side === dictionary.white ? 'white' : 'black') + '<br/>' +
                 'Turn: ' + (this.side === dictionary.white ? 'white' : 'black');
         },
@@ -172,6 +182,10 @@ var dictionary = {
 
             if (typeof this.player !== 'undefined' && this.side === this.player.side) {
                 this.playerMoves = this.player.moves();
+                //console.log('Player moves:', this.playerMoves);
+                //for (i = 0; i < this.playerMoves.length; ++i) {
+                //    console.log(this.player.algebraic(this.playerMoves[i]));
+                //}
             }
             
             ranks = '<tr><td></td>';
@@ -191,7 +205,9 @@ var dictionary = {
                     
                     draggable = '';
                     for (i = 0; i < this.playerMoves.length; ++i) {
-                        if (this.playerMoves[i].from[0] === rank && this.playerMoves[i].from[1] === file) {
+                        if (typeof this.playerMoves[i].from !== 'undefined' &&
+                                this.playerMoves[i].from[0] === rank &&
+                                this.playerMoves[i].from[1] === file) {
                             draggable = ' draggable="true" ondragstart="drag(event)"';
                             break;
                         }

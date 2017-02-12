@@ -1,5 +1,5 @@
 /*jslint plusplus: true */
-/*global dictionary, game, console */
+/*global dictionary, game, console, alert*/
 
 function Player(side) {
     'use strict';
@@ -172,9 +172,34 @@ Player.prototype.pieceMoves = function (rank, file, moves) {
     }
 };
 
+Player.prototype.pieceDropMoves = function (dropCost, piece, moves) {
+    'use strict';
+    var file, rank = (piece.toLowerCase() === 'p' ? 6 : 7);
+    piece = piece.toUpperCase(); // white piece
+
+    if (this.side === dictionary.black) {
+        rank = (piece.toLowerCase() === 'p' ? 1 : 0);
+        piece = piece.toLowerCase(); // black piece
+    }
+
+    for (file = 0; file < game.files; ++file) {
+        if (game.board[rank][file] === ' ') {
+            moves.push({dropCost: dropCost, piece: piece, toPiece: ' ', to: [rank, file]});
+        }
+    }
+
+};
+
 Player.prototype.moves = function () {
     'use strict';
-    var rank, file, moves = [];
+    var i, rank, file, moves = [];
+
+    // any possible drop moves
+    for (i in dictionary.cp) {
+        if (dictionary.cp.hasOwnProperty(i) && this.centipawns >= dictionary.cp[i]) {
+            this.pieceDropMoves(dictionary.cp[i], i.substring(4), moves);
+        }
+    }
 
     // now get the moves for my pieces...
     for (file = 0; file < game.files; ++file) {
@@ -192,13 +217,19 @@ Player.prototype.think = function () {
     'use strict';
     var i, moves = this.moves(this.side);
 
-    console.log('Moves:');
-    for (i = 0; i < moves.length; ++i) {
-        console.log(this.algebraic(moves[i]));
-    }
+    //console.log('Moves:');
+    //for (i = 0; i < moves.length; ++i) {
+    //    console.log(this.algebraic(moves[i]));
+    //}
 
     // make the first move (essentially at random)
     // need to sort moves by heuristic, and perform some sort of depth search
-    game.makeMove(moves[0]);
-    game.prepareUIForNextMove();
+    if (moves.length > 0) {
+        game.makeMove(moves[0]);
+        game.prepareUIForNextMove();
+    }
+
+    if (moves.length === 0) {
+        alert('Checkmate!  For new game, refresh page');
+    }
 };

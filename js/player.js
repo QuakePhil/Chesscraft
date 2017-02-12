@@ -74,6 +74,7 @@ Player.prototype.tryMove = function (moves, move) {
                 validMove = false;
             }
         }
+        this.opponent().noDepth = false;
         game.unmakeMove();
     }
 

@@ -74,6 +74,15 @@ var dictionary = {
             if (typeof move.from !== 'undefined') {
                 this.board[move.from[0]][move.from[1]] = ' ';
             }
+            
+            if (move.piece === 'P' && move.to[0] === 0) {
+                console.log('white queens');
+                move.piece = 'Q';
+            }
+            if (move.piece === 'p' && move.to[0] === 7) {
+                console.log('black queens');
+                move.piece = 'q';
+            }
             this.board[move.to[0]][move.to[1]] = move.piece; // need to also save ep square, castling, side, etc
 
             if (this.side === 0) {

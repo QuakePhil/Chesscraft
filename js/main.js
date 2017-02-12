@@ -10,7 +10,15 @@ function allowDrop(e) {
         if (game.player.centipawns < game.centipawns) { return false; }
 
         // disallow for any but the first 2 ranks
-        if (parseInt(e.target.id.substring(6), 10) < 48) { return false; }
+        if (game.playerDropping.toLowerCase() === 'p' &&
+                (parseInt(e.target.id.substring(6), 10) < 48 || 
+                parseInt(e.target.id.substring(6), 10) >= 56)) {
+            return false;
+        }
+        if (game.playerDropping.toLowerCase() !== 'p' &&
+                parseInt(e.target.id.substring(6), 10) < 56) {
+            return false;
+        }
     }
 
     e.preventDefault();
@@ -19,7 +27,7 @@ function allowDrop(e) {
 function drag(e) {
     'use strict';
     e.dataTransfer.setData('text', e.target.id);
-    game.playerDropping = (e.target.id.substring(0, 4) === 'drop');
+    game.playerDropping = (e.target.id.substring(0, 4) === 'drop' ? e.target.id.substring(4) : false);
     game.centipawns = dictionary.cp[e.target.id];
 }
 
